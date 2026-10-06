@@ -3,18 +3,21 @@ import type { ClassifyRequest, ClassifyResponse, Priority } from '../api/types';
 /**
  * Imitación sintética del servicio de clasificación: un guardrail de señales
  * de alarma por palabras clave y, si no hay ninguna, un puntaje que depende
- * solo de la urgencia estructurada. No es el modelo real.
+ * solo de la urgencia estructurada. No es el modelo real, pero devuelve los
+ * mismos códigos de señal de alarma que el servicio de clasificación.
  */
 const ALARM_PATTERNS: readonly { sign: string; pattern: RegExp }[] = [
-  { sign: 'Dolor torácico', pattern: /dolor (toracico|precordial|en el pecho)/ },
-  { sign: 'Disnea', pattern: /disnea|dificultad para respirar/ },
-  { sign: 'Síncope', pattern: /sincope|desmayo/ },
+  { sign: 'dolor_toracico', pattern: /dolor toracico|dolor en el pecho|opresion en el pecho/ },
   {
-    sign: 'Déficit neurológico focal',
-    pattern: /deficit neurologico|hemiparesia|perdida de fuerza/,
+    sign: 'ideacion_suicida',
+    pattern: /ideacion suicida|pensamientos de muerte|pensamientos suicidas/,
   },
-  { sign: 'Sangrado activo', pattern: /sangrado|hemorragia/ },
-  { sign: 'Pérdida de peso no intencional', pattern: /perdida de peso/ },
+  {
+    sign: 'dificultad_respiratoria',
+    pattern: /dificultad para respirar|falta de aire|disnea|ahogo/,
+  },
+  { sign: 'sincope', pattern: /desmayo|sincope|perdida de conocimiento/ },
+  { sign: 'herida_arma_fuego', pattern: /herida por arma de fuego|disparo/ },
 ];
 
 const ML_SCORE_BY_URGENCY = [0.16, 0.47, 0.78] as const;

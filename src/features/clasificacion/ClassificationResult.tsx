@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { PriorityBand, PriorityLabel } from '../../components/ui/Priority';
 import { StatusMessage } from '../../components/ui/StatusMessage';
 import { formatScore, PRIORITIES, PRIORITY_LABEL, SOURCE_LABEL } from '../../domain/prioridad';
+import { alarmSignLabel } from '../../domain/senalesAlarma';
 import { useReview } from './useReview';
 
 interface ClassificationResultProps {
@@ -62,7 +63,7 @@ export function ClassificationResult({ result, children }: ClassificationResultP
             ) : (
               <ul className="list-disc pl-5 font-bold">
                 {result.alarm_signs.map((sign) => (
-                  <li key={sign}>{sign}</li>
+                  <li key={sign}>{alarmSignLabel(sign)}</li>
                 ))}
               </ul>
             )}

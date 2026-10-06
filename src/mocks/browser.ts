@@ -1,4 +1,7 @@
 import { setupWorker } from 'msw/browser';
-import { handlers } from './handlers';
+import { createHandlers } from './handlers';
 
-export const worker = setupWorker(...handlers);
+// VITE_MOCK_CLASSIFY=false deja pasar POST /classify al servicio real (modo mixto).
+const mockClassify = import.meta.env.VITE_MOCK_CLASSIFY !== 'false';
+
+export const worker = setupWorker(...createHandlers({ mockClassify }));

@@ -1,4 +1,4 @@
-import { delay, http, HttpResponse, type HttpHandler } from 'msw';
+import { bypass, delay, http, HttpResponse, type HttpHandler } from 'msw';
 import { apiUrl } from '../api/client';
 import type {
   ClassifyRequest,
@@ -29,13 +29,13 @@ function findDecision(id: string) {
   if (!fromQueue) return undefined;
   return {
     ...fromQueue,
-    alarm_signs: fromQueue.source === 'guardrail' ? ['Señal sintética de demostración'] : [],
+    alarm_signs: fromQueue.source === 'guardrail' ? ['dolor_toracico'] : [],
   };
 }
 
-/** Manejadores de MSW compartidos por el navegador (desarrollo) y las pruebas. */
-export const handlers: HttpHandler[] = [
-  http.post<never, ClassifyRequest, ClassifyResponse>(apiUrl('/classify'), async ({ request }) => {
+const simulatedClassify = http.post<never, ClassifyRequest, ClassifyResponse>(
+  apiUrl('/classify'),
+  async ({ request }) => {
     const body = await request.json();
     await delay();
     if (body.text.includes(SIMULATED_FAILURE_MARK)) {
@@ -44,8 +44,40 @@ export const handlers: HttpHandler[] = [
     const result = classifySynthetic(body);
     classified.set(result.referral_id, result);
     return HttpResponse.json(result);
-  }),
+  },
+);
 
+/**
+ * Modo mixto: la petición sale hacia el servicio de clasificación real y su
+ * respuesta se devuelve intacta. Solo se toma nota del resultado para que la
+ * explicación simulada sea coherente con él.
+ */
+const realClassify = http.post(apiUrl('/classify'), async ({ request }) => {
+  let response: Response;
+  try {
+    response = await fetch(bypass(request));
+  } catch {
+    return HttpResponse.error();
+  }
+  if (response.ok) {
+    const result = (await response.clone().json()) as ClassifyResponse;
+    classified.set(result.referral_id, result);
+  }
+  return response;
+});
+
+interface HandlerOptions {
+  /** false: POST /classify va al servicio real; el resto sigue simulado. */
+  mockClassify?: boolean;
+}
+
+/** Manejadores de MSW compartidos por el navegador (desarrollo) y las pruebas. */
+export function createHandlers({ mockClassify = true }: HandlerOptions = {}): HttpHandler[] {
+  return [mockClassify ? simulatedClassify : realClassify, ...supportHandlers];
+}
+
+/** Endpoints que el servicio de clasificación real todavía no ofrece. */
+const supportHandlers: HttpHandler[] = [
   http.post<{ id: string }, ReviewRequest, ReviewResponse>(
     apiUrl('/referrals/:id/review'),
     async ({ params, request }) => {
@@ -109,3 +141,5 @@ export const handlers: HttpHandler[] = [
     },
   ),
 ];
+
+export const handlers: HttpHandler[] = createHandlers();

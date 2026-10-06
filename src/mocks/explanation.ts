@@ -1,4 +1,5 @@
 import type { ClassifyResponse, Explanation } from '../api/types';
+import { alarmSignLabel } from '../domain/senalesAlarma';
 import { formatScore, PRIORITY_LABEL } from '../domain/prioridad';
 
 type Explainable = Pick<
@@ -22,7 +23,7 @@ export function explainSynthetic(decision: Explainable): Explanation {
       summary:
         'Una regla clínica detectó señales de alarma en el texto y fijó la prioridad en ALTA, sin depender del modelo estadístico.',
       factors: decision.alarm_signs.map((sign) => ({
-        label: `Señal de alarma: ${sign}`,
+        label: `Señal de alarma: ${alarmSignLabel(sign)}`,
         effect: 'increases',
       })),
     };

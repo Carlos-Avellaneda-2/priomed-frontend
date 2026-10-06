@@ -13,7 +13,7 @@ const RESULT: ClassifyResponse = {
   priority: 'HIGH',
   source: 'guardrail',
   high_score: 0.93,
-  alarm_signs: ['Dolor torácico'],
+  alarm_signs: ['dolor_toracico', 'sincope'],
   requires_human_review: true,
 };
 
@@ -49,6 +49,8 @@ describe('Validación humana de la prioridad', () => {
     expect(screen.getByText('Regla clínica (guardrail)')).toBeVisible();
     expect(screen.getByText('0,93')).toBeVisible();
     expect(screen.getByText('Dolor torácico')).toBeVisible();
+    expect(screen.getByText('Síncope')).toBeVisible();
+    expect(screen.queryByText('dolor_toracico')).not.toBeInTheDocument();
   });
 
   it('no queda confirmada sin acción humana', () => {

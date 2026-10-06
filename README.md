@@ -35,8 +35,8 @@ hace falta ningún backend.
 
 ### Probar los estados con la API simulada
 
-- **Guardrail**: escriba en el caso «dolor torácico», «disnea», «síncope», «sangrado», «pérdida de
-  peso» o «déficit neurológico». La prioridad será ALTA con origen `guardrail`.
+- **Guardrail**: escriba en el caso «dolor torácico», «disnea», «síncope», «pensamientos de muerte»
+  o «herida por arma de fuego». La prioridad será ALTA con origen `guardrail`.
 - **Modelo (ML)**: sin señales de alarma, la prioridad depende de la urgencia elegida (0, 1 o 2).
 - **Error al clasificar**: incluya el texto `[simular error]` en el caso.
 - **Error y reintento en la explicación**: en la cola, abra `REM-SIM-0007`; falla la primera vez y
@@ -46,10 +46,33 @@ hace falta ningún backend.
 
 ## Variables de entorno
 
-| Variable         | Descripción                                                            | Valor por defecto                         |
-| ---------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
-| `VITE_API_URL`   | URL base de la API, sin barra final.                                   | vacío (mismo origen)                      |
-| `VITE_USE_MOCKS` | `true` simula la API con MSW en el navegador; `false` usa la API real. | `true` en desarrollo, `false` al compilar |
+| Variable             | Descripción                                                                                               | Valor por defecto                         |
+| -------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `VITE_API_URL`       | URL base de la API, sin barra final.                                                                      | vacío (mismo origen)                      |
+| `VITE_USE_MOCKS`     | `true` simula la API con MSW en el navegador; `false` usa la API real.                                    | `true` en desarrollo, `false` al compilar |
+| `VITE_MOCK_CLASSIFY` | Con mocks activos, `false` envía `POST /classify` al servicio real y deja simulado el resto (modo mixto). | `true`                                    |
+
+## Integración con el servicio de clasificación real
+
+`priomed-classification-service` solo ofrece `POST /classify`. El **modo mixto** envía esa llamada al
+servicio real y mantiene simulados la validación, la cola, la explicación y el tablero:
+
+```bash
+# Terminal 1, en priomed-classification-service
+uvicorn priomed_classification.api:app --port 8000
+
+# Terminal 2, en priomed-frontend (.env)
+VITE_API_URL=http://localhost:8000
+VITE_USE_MOCKS=true
+VITE_MOCK_CLASSIFY=false
+npm run dev
+```
+
+El servicio debe autorizar el origen del frontend por CORS; por defecto admite
+`http://localhost:5173` y `http://localhost:4173` (variable `PRIOMED_CORS_ORIGINS`).
+
+Las señales de alarma llegan como códigos (`dolor_toracico`, `sincope`, ...) y se traducen en
+`src/domain/senalesAlarma.ts`. Un código sin traducción se muestra tal cual, nunca se oculta.
 
 ## Scripts
 
