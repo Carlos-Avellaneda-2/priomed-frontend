@@ -20,6 +20,44 @@ confirmada**. El regulador (Ministerio de Salud) solo ve indicadores agregados y
 
 Cada rol solo ve sus pantallas: cualquier otra ruta lo devuelve a su inicio.
 
+## Capturas
+
+Tomadas el 5 de octubre de 2026 sobre el build de producción en **modo mixto**: `POST /classify`
+respondido por `priomed-classification-service` real en `localhost:8000`, y validación, cola,
+explicación y tablero simulados con MSW. Todos los datos son sintéticos.
+
+**Ingreso por rol**, con la leyenda de cómo se lee la prioridad.
+
+![Pantalla de ingreso con selector de rol y leyenda de prioridad](docs/capturas/01-ingreso.png)
+
+**Resultado de clasificación sin confirmar.** La prioridad, el origen, el puntaje y las señales de
+alarma vienen del servicio real; el estado permanece «Sin confirmar» hasta la acción humana.
+
+![Resultado ALTA por guardrail, sin confirmar, con botones Confirmar y Corregir](docs/capturas/02-resultado-sin-confirmar.png)
+
+**Resultado confirmado**, con la explicación desplegada.
+
+![Resultado ALTA confirmado por validación humana, con explicación](docs/capturas/03-resultado-confirmado.png)
+
+**Cola priorizada** (IPS) con el panel de explicación de la remisión seleccionada.
+
+![Cola ordenada por prioridad con panel de explicación](docs/capturas/04-cola-explicacion.png)
+
+**Tablero de cumplimiento MGTE** (regulador) con indicadores agregados.
+
+![Tablero con remisiones procesadas, espera promedio y porcentaje dentro del umbral](docs/capturas/05-cumplimiento.png)
+
+**Respuesta 204 del tablero**: aviso de privacidad, no error.
+
+![Aviso de que no hay datos suficientes para mostrar por privacidad](docs/capturas/06-cumplimiento-sin-datos.png)
+
+**Móvil (360 px)**: resultado de clasificación y cola.
+
+<p>
+  <img src="docs/capturas/07-movil-resultado.png" alt="Resultado de clasificación en móvil" width="300" />
+  <img src="docs/capturas/08-movil-cola.png" alt="Cola priorizada en móvil" width="300" />
+</p>
+
 ## Cómo correrlo
 
 Requiere Node.js 22 o superior.

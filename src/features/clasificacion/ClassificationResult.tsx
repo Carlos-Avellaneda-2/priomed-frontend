@@ -43,7 +43,10 @@ export function ClassificationResult({ result, children }: ClassificationResultP
         <p className="text-tinta-suave">
           {reviewed ? 'Prioridad final' : 'Prioridad propuesta por el sistema'}
         </p>
-        <PriorityLabel priority={shownPriority} size="lg" />
+        {/* En bloque propio: el estado de validación va siempre en la línea siguiente. */}
+        <div>
+          <PriorityLabel priority={shownPriority} size="lg" />
+        </div>
 
         <ValidationStatus proposed={result.priority} reviewed={reviewed} />
 
