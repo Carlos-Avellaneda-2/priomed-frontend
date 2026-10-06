@@ -1,0 +1,131 @@
+@import 'tailwindcss';
+
+/*
+ * Tokens de diseño de PrioMed ("señalética de triage").
+ * Tailwind 4 expone cada token de @theme como variable CSS en :root
+ * (var(--color-tinta), var(--spacing-banda), ...) y genera sus utilidades.
+ */
+@theme {
+  /* Color: superficies y texto */
+  --color-niebla: #eef2f1;
+  --color-blanco: #ffffff;
+  --color-tinta: #14262b;
+  --color-tinta-suave: #44575c;
+  --color-borde: #6b7f84;
+  --color-borde-suave: #c9d3d3;
+
+  /* Color: acción */
+  --color-petroleo: #0f5560;
+  --color-petroleo-oscuro: #0a3d45;
+
+  /* Color: prioridad (siempre acompañado de trama, icono y texto) */
+  --color-carmin: #b3212e;
+  --color-carmin-tinte: #fbecec;
+  --color-ambar: #8a5a00;
+  --color-ambar-tinte: #fbf3e0;
+  --color-azul: #2f5d8a;
+  --color-azul-tinte: #eaf1f8;
+
+  /* Color: estado de validación */
+  --color-exito: #1f6b45;
+  --color-exito-tinte: #e6f3ec;
+
+  /* Tipografía */
+  --font-sans: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Barlow Condensed', 'Arial Narrow', 'Atkinson Hyperlegible', sans-serif;
+
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.45;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.4;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.25;
+  --text-2xl: 2rem;
+  --text-2xl--line-height: 1.15;
+  --text-display: 3.25rem;
+  --text-display--line-height: 1;
+
+  /* Espaciado */
+  --spacing: 0.25rem;
+  --spacing-banda: 0.75rem;
+  --spacing-margen: 1rem;
+  --container-lectura: 42rem;
+  --container-pagina: 72rem;
+
+  /* Forma */
+  --radius-base: 4px;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-niebla);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-petroleo);
+    outline-offset: 2px;
+  }
+
+  input[type='radio'] {
+    accent-color: var(--color-petroleo);
+  }
+}
+
+@layer components {
+  /*
+   * Banda de prioridad: el nivel se lee por la trama, no solo por el color.
+   * ALTA sólida, MEDIA diagonal, BAJA punteada.
+   */
+  .banda {
+    flex: none;
+    align-self: stretch;
+    width: var(--spacing-banda);
+    min-height: 2.5rem;
+  }
+
+  .banda-HIGH {
+    background-color: var(--color-carmin);
+  }
+
+  .banda-MEDIUM {
+    background-color: var(--color-ambar-tinte);
+    background-image: repeating-linear-gradient(
+      135deg,
+      var(--color-ambar) 0 3px,
+      transparent 3px 7px
+    );
+  }
+
+  .banda-LOW {
+    background-color: var(--color-azul-tinte);
+    background-image: radial-gradient(circle, var(--color-azul) 1.5px, transparent 2px);
+    background-size: 6px 6px;
+  }
+
+  @media (forced-colors: active) {
+    .banda {
+      border: 1px solid CanvasText;
+      forced-color-adjust: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
